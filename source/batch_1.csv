@@ -1,4 +1,4 @@
 order_id,customer_id,order_date,shipping_date,shipping_address,amount,status,country_code
-3a1b2c3d-4e5f-3a6b-7c8d-9e0f1a2b3c4d,3b2c1d4e-5f6a-3b7c-8d9e-0f1a2b3c4d5e,2025-12-09,2025-12-09,"123 Main Street, New York, NY 10001",99.99,PENDING,US
-3c4d5e6f-7a8b-3c9d-0e1f-2a3b4c5d6e7f,3d4e5f6a-7b8c-3d0e-1f2a-3b4c5d6e7f8a,2025-12-09,2025-12-09,"456 Oak Avenue, Los Angeles, CA 90001",149.50,SHIPPED,US
-3e6f7a8b-9c0d-3e1f-2a3b-4c5d6e7f8a9b,3f7a8b9c-0d1e-3f2a-3b4c-5d6e7f8a9b0c,2025-12-09,2025-12-09,"789 Pine Road, Chicago, IL 60601",75.25,PENDING,US
+3a1b2c3d-4e5f-3a6b-8c8d-9e0f1a2b3c4d,3b2c1d4e-5f6a-3b7c-8d9e-0f1a2b3c4d5e,2025-12-09,2025-12-09,"123 Main Street, New York, NY 10001",99.99,PENDING,US
+3c4d5e6f-7a8b-3c9d-8e1f-2a3b4c5d6e7f,3d4e5f6a-7b8c-3d0e-8f2a-3b4c5d6e7f8a,2025-12-09,2025-12-09,"456 Oak Avenue, Los Angeles, CA 90001",149.50,SHIPPED,US
+3e6f7a8b-9c0d-3e1f-8a3b-4c5d6e7f8a9b,3f7a8b9c-0d1e-3f2a-8b4c-5d6e7f8a9b0c,2025-12-09,2025-12-09,"789 Pine Road, Chicago, IL 60601",75.25,PENDING,US

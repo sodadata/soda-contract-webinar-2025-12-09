@@ -1,8 +1,5 @@
 soda_cloud:
-
   host: ${env.SODA_CLOUD_ENV}
-
   api_key_id: ${env.SODA_CLOUD_API_KEY}
-
   api_key_secret: ${env.SODA_CLOUD_API_SECRET}
 

@@ -65,3 +65,12 @@ dmypy.json
 .soda/
 orders.yaml
 
+# Airflow
+logs/
+*.log
+airflow.db
+airflow.db-shm
+airflow.db-wal
+airflow-webserver.pid
+simple_auth_manager_passwords.json.generated
+

@@ -1,12 +1,19 @@
 # Soda dependencies (install from Soda's private PyPI)
-# Install with: pip install -i https://pypi.dev.sodadata.io/simple -U soda-postgres
+# Install with: pip install -i https://pypi.dev.sodadata.io/simple -U soda-postgres soda-duckdb
 soda-postgres>=4.0.0b14
+soda-duckdb>=4.0.0b14
 
 # Database connections
 psycopg2-binary>=2.8.5
+
+# Data processing
+pandas>=2.0.0
 duckdb>=0.9.0
 
 # Environment and configuration
 python-dotenv>=1.0.0
 PyYAML>=6.0
+
+# Airflow (optional - only needed if running with Airflow)
+apache-airflow>=2.7.0
 
