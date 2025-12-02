@@ -1,0 +1,12 @@
+# Soda dependencies (install from Soda's private PyPI)
+# Install with: pip install -i https://pypi.dev.sodadata.io/simple -U soda-postgres
+soda-postgres>=4.0.0b14
+
+# Database connections
+psycopg2-binary>=2.8.5
+duckdb>=0.9.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
+PyYAML>=6.0
+

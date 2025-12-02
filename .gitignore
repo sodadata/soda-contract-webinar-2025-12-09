@@ -63,4 +63,5 @@ dmypy.json
 
 # Soda specific
 .soda/
+orders.yaml
 

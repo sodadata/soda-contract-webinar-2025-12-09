@@ -1,0 +1,5 @@
+order_id,customer_id,order_date,shipping_date,shipping_address,amount,status,country_code
+3a8b9c0d-1e2f-3a3b-4c5d-6e7f8a9b0c1d,3b9c0d1e-2f3a-3b4c-5d6e-7f8a9b0c1d2e,2025-12-09,2025-12-09,"321 Elm Street, Houston, TX 77001",200.00,SHIPPED,US
+3c0d1e2f-3a4b-3c5d-6e7f-8a9b0c1d2e3f,3d1e2f3a-4b5c-3d6e-7f8a-9b0c1d2e3f4a,2025-12-09,2025-12-09,"654 Maple Drive, Phoenix, AZ 85001",45.75,CANCELLED,US
+3f2a3b4c-5d6e-3f7a-8b9c-0d1e2f3a4b5c,3a3b4c5d-6e7f-3a8b-9c0d-1e2f3a4b5c6d,2025-12-09,2025-12-09,"987 Cedar Lane, San Diego, CA 92101",125.00,PENDING,US
+

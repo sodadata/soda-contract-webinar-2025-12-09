@@ -5,6 +5,7 @@
 #   ./soda.sh data-source-test                  # Test data source connection
 #   ./soda.sh soda-cloud-test                   # Test Soda Cloud connection
 #   ./soda.sh verify                            # Verify a contract
+#   ./soda.sh generate                          # Generate a contract
 #   ./soda.sh fetch-proposal <request_id>.<proposal_id>  # Fetch a proposal
 
 set -e
@@ -75,6 +76,36 @@ if [ "$1" == "verify" ]; then
     exit 0
 fi
 
+# If first argument is "generate", generate a contract
+if [ "$1" == "generate" ]; then
+    # Hardcoded dataset path
+    DATASET="webinardb/postgres/public/orders"
+    
+    # Check if data source file exists
+    if [ ! -f "$DATA_SOURCE" ]; then
+        echo "Error: Data source file not found: $DATA_SOURCE"
+        exit 1
+    fi
+    
+    # Check if cloud config file exists
+    if [ ! -f "$CLOUD_CONFIG" ]; then
+        echo "Error: Soda Cloud config file not found: $CLOUD_CONFIG"
+        exit 1
+    fi
+    
+    echo "Generating contract..."
+    echo "Dataset: $DATASET"
+    echo "Output file: $CONTRACT_PATH"
+    echo "Using data source: $DATA_SOURCE"
+    echo "Using cloud config: $CLOUD_CONFIG"
+    echo ""
+    echo "Running: soda contract create --dataset $DATASET --file $CONTRACT_PATH --data-source $DATA_SOURCE --soda-cloud $CLOUD_CONFIG"
+    echo ""
+    
+    soda contract create --dataset "$DATASET" --file "$CONTRACT_PATH" --data-source "$DATA_SOURCE" --soda-cloud "$CLOUD_CONFIG"
+    exit 0
+fi
+
 # If first argument is "fetch-proposal", fetch a proposal
 if [ "$1" == "fetch-proposal" ]; then
     # Check if cloud config file exists
@@ -129,10 +160,12 @@ echo "Error: Unknown command: $1"
 echo "Usage: $0 data-source-test               # Test data source connection"
 echo "       $0 soda-cloud-test                # Test Soda Cloud connection"
 echo "       $0 verify                          # Verify a contract"
+echo "       $0 generate                        # Generate a contract"
 echo "       $0 fetch-proposal <request_id>.<proposal_id>  # Fetch a proposal"
 echo ""
 echo "Examples:"
 echo "  $0 verify"
+echo "  $0 generate"
 echo "  $0 fetch-proposal 45.1"
 exit 1
 

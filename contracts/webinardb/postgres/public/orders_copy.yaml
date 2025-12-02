@@ -1,0 +1,96 @@
+dataset: webinardb/postgres/public/orders
+checks:
+  - schema:
+      name: Schema must match exactly
+      allow_extra_columns: false
+      allow_other_column_order: false
+  - duplicate:
+      name: No duplicate order_id
+      columns:
+        - order_id
+  - freshness:
+      name: Order date freshness <= 2 days
+      column: order_date
+      threshold:
+        unit: day
+        must_be_less_than_or_equal: 2
+  - failed_rows:
+      name: shipping_date should not be earlier than order_date
+      expression: shipping_date < order_date
+      threshold:
+        must_be: 0
+columns:
+  - name: order_id
+    data_type: text
+    checks:
+      - missing:
+          name: order_id must be present
+      - invalid:
+          qualifier: k2x9b
+          name: order_id must be UUID v3
+          valid_format:
+            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-3[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+            name: uuid_v3
+  - name: customer_id
+    data_type: text
+    checks:
+      - missing:
+          name: customer_id must be present
+      - invalid:
+          qualifier: m5t7q
+          name: customer_id must be UUID v3
+          valid_format:
+            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-3[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+            name: uuid_v3
+  - name: order_date
+    data_type: date
+    checks:
+      - missing:
+          name: order_date must be present
+  - name: shipping_date
+    data_type: date
+    checks:
+      - missing:
+          name: shipping_date must be present
+  - name: shipping_address
+    data_type: text
+    checks:
+      - missing:
+          name: shipping_address must be present
+      - invalid:
+          qualifier: p3f9k
+          name: shipping_address reasonable length
+          valid_min_length: 5
+          valid_max_length: 200
+  - name: amount
+    data_type: numeric
+    checks:
+      - missing:
+          name: amount must be present
+      - invalid:
+          qualifier: q7m2d
+          name: amount must be non-negative
+          valid_min: 0
+  - name: status
+    data_type: text
+    checks:
+      - missing:
+          name: status must be present
+      - invalid:
+          qualifier: u4a1c
+          name: status must be valid
+          valid_values:
+            - PENDING
+            - SHIPPED
+            - CANCELLED
+  - name: country_code
+    data_type: text
+    checks:
+      - missing:
+          name: country_code must be present
+      - invalid:
+          qualifier: z8r5n
+          name: country_code must be 2 uppercase letters
+          valid_format:
+            regex: ^[A-Z]{2}$
+            name: AA

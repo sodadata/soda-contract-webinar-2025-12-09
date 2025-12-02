@@ -1,0 +1,5 @@
+order_id,customer_id,order_date,shipping_date,shipping_address,amount,status,country_code
+3a2b3c4d-5e6f-3a7b-8c9d-0e1f2a3b4c5d,3b3c4d5e-6f7a-3b8c-9d0e-1f2a3b4c5d6e,2025-12-09,2025-12-05,"2323 Twenty-Third Lane, Las Vegas, NV 89101",-30.00,SHIPPED,US
+4c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f,4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a,2025-12-09,2025-12-09,"2424 Twenty-Fourth Circle, Raleigh, NC 27601",178.88,REFUNDED,US
+3e6f7a8b-9c0d-3e1f-2a3b-4c5d6e7f8a9b,3f7a8b9c-0d1e-3f2a-3b4c-5d6e7f8a9b0c,2025-12-09,2025-12-09,"2525 Twenty-Fifth Drive, Omaha, NE 68101",67.25,PENDING,USA
+
