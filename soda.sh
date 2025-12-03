@@ -5,8 +5,10 @@
 #   ./soda.sh data-source-test                  # Test data source connection
 #   ./soda.sh soda-cloud-test                   # Test Soda Cloud connection
 #   ./soda.sh verify                            # Verify a contract
+#   ./soda.sh verify -p <contract_path>         # Verify a contract with custom path
 #   ./soda.sh generate                          # Generate a contract
 #   ./soda.sh fetch-proposal <request_id>.<proposal_id>  # Fetch a proposal
+#   ./soda.sh fetch-proposal <request_id>.<proposal_id> -p <contract_path>  # Fetch with custom path
 
 set -e
 
@@ -19,6 +21,18 @@ source "$SCRIPT_DIR/venv/bin/activate"
 DATA_SOURCE="soda-db-config.yaml"
 CLOUD_CONFIG="soda-cloud-config.yaml"
 CONTRACT_PATH="contracts/webinardb/postgres/public/orders.yaml"
+
+# Function to parse -p flag from arguments
+parse_contract_path() {
+    local args=("$@")
+    for i in "${!args[@]}"; do
+        if [ "${args[i]}" == "-p" ] && [ -n "${args[i+1]}" ]; then
+            echo "${args[i+1]}"
+            return 0
+        fi
+    done
+    echo ""
+}
 
 # If first argument is "data-source-test", test the data source connection
 if [ "$1" == "data-source-test" ]; then
@@ -54,6 +68,12 @@ fi
 
 # If first argument is "verify", verify a contract
 if [ "$1" == "verify" ]; then
+    # Parse -p flag if provided
+    CUSTOM_PATH=$(parse_contract_path "$@")
+    if [ -n "$CUSTOM_PATH" ]; then
+        CONTRACT_PATH="$CUSTOM_PATH"
+    fi
+    
     # Check if data source file exists
     if [ ! -f "$DATA_SOURCE" ]; then
         echo "Error: Data source file not found: $DATA_SOURCE"
@@ -117,8 +137,9 @@ if [ "$1" == "fetch-proposal" ]; then
     # Check if argument is provided
     if [ -z "$2" ]; then
         echo "Error: Request ID and Proposal ID are required"
-        echo "Usage: $0 fetch-proposal <request_id>.<proposal_id>"
+        echo "Usage: $0 fetch-proposal <request_id>.<proposal_id> [-p <contract_path>]"
         echo "Example: $0 fetch-proposal 45.1"
+        echo "Example: $0 fetch-proposal 45.1 -p contracts/custom/path.yaml"
         exit 1
     fi
     
@@ -129,7 +150,7 @@ if [ "$1" == "fetch-proposal" ]; then
         PROPOSAL_ID="${ARG##*.}"
     else
         echo "Error: Invalid format. Expected <request_id>.<proposal_id>"
-        echo "Usage: $0 fetch-proposal <request_id>.<proposal_id>"
+        echo "Usage: $0 fetch-proposal <request_id>.<proposal_id> [-p <contract_path>]"
         echo "Example: $0 fetch-proposal 45.1"
         exit 1
     fi
@@ -137,9 +158,15 @@ if [ "$1" == "fetch-proposal" ]; then
     # Validate that both IDs are present
     if [ -z "$REQUEST_ID" ] || [ -z "$PROPOSAL_ID" ]; then
         echo "Error: Both Request ID and Proposal ID are required"
-        echo "Usage: $0 fetch-proposal <request_id>.<proposal_id>"
+        echo "Usage: $0 fetch-proposal <request_id>.<proposal_id> [-p <contract_path>]"
         echo "Example: $0 fetch-proposal 45.1"
         exit 1
+    fi
+    
+    # Parse -p flag if provided
+    CUSTOM_PATH=$(parse_contract_path "$@")
+    if [ -n "$CUSTOM_PATH" ]; then
+        CONTRACT_PATH="$CUSTOM_PATH"
     fi
     
     echo "Fetching proposal..."
