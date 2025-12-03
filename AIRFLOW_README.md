@@ -36,9 +36,8 @@ AIRFLOW_HOME=/Users/benjaminpirotte/Documents/soda/soda-contract-webinar
 
 ### 3. DAG Files Location
 
-The DAG files are already in the correct location:
-- `dags/orders_pipeline_dag.py` - The Airflow DAG
-- `dags/orders_pipeline.py` - The pipeline functions (imported by the DAG)
+The DAG file is already in the correct location:
+- `dags/orders_pipeline_dag.py` - The Airflow DAG (contains all pipeline functions)
 
 Since `AIRFLOW_HOME` is set to your project root, Airflow will automatically discover DAGs in the `dags/` folder. No additional configuration needed!
 
@@ -146,7 +145,7 @@ To test with different CSV batches, trigger the DAG with a config:
 ### Import Errors
 
 - Ensure all dependencies are installed: `pip install -r requirements.txt`
-- Check that `orders_pipeline.py` is in the same directory as the DAG
+- Check that all required modules are available in your Python environment
 
 ### Connection Issues
 

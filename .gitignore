@@ -65,12 +65,16 @@ dmypy.json
 .soda/
 orders.yaml
 
-# Airflow
+# Airflow - ignore all temp/runtime files, but keep airflow.cfg
 logs/
 *.log
 airflow.db
 airflow.db-shm
 airflow.db-wal
 airflow-webserver.pid
+airflow-webserver.pid.lock
 simple_auth_manager_passwords.json.generated
+unittests.cfg
+webserver_config.py
+!airflow.cfg
 

@@ -1,0 +1,198 @@
+dataset: dremio_v4_ben/postgresql/public/bus_breakdown_and_delays
+
+soda_agent:
+  checks_schedule:
+    cron: 0 0 * * *
+    timezone: UTC
+
+checks:
+  - row_count:
+      name: row_count > 0
+      qualifier: a18554be-dc22-458d-9c34-1978c305e0ce
+      threshold:
+        must_be_greater_than: 0
+
+columns:
+  - name: school_year
+    data_type: text
+    checks:
+      - invalid:
+          name: invalid_count(school_year) = 0
+          qualifier: abbfab59-aa09-42c4-a0e2-eff80b501823
+          threshold:
+            must_be: 0
+            metric: count
+          invalid_format:
+            regex: ^(?!\d{4}-\d{4}$).+$
+            name: regex
+
+  - name: busbreakdown_id
+    data_type: text
+    checks:
+      - missing:
+          name: missing_count(busbreakdown_id) = 0
+          qualifier: 68230199-8dc0-47ab-8ce8-182603837380
+          threshold:
+            must_be: 0
+            metric: count
+      - duplicate:
+          name: duplicate_count(busbreakdown_id) = 0
+          qualifier: a0c20a27-0dc5-4c77-b971-677475e5cbd7
+          threshold:
+            must_be: 0
+            metric: count
+
+  - name: run_type
+    data_type: text
+
+  - name: bus_no
+    data_type: text
+
+  - name: route_number
+    data_type: text
+
+  - name: reason
+    data_type: text
+
+  - name: schools_serviced
+    data_type: text
+
+  - name: occurred_on
+    data_type: timestamp
+    checks:
+      - missing:
+          name: missing_count(occurred_on) = 0
+          qualifier: 3ae3bf17-3974-4090-bc9c-653ffcbcc52a
+          threshold:
+            must_be: 0
+            metric: count
+          missing_values: []
+
+  - name: created_on
+    data_type: timestamp
+    checks:
+      - missing:
+          name: missing_count(created_on) = 0
+          qualifier: 85ca421f-2cf2-478d-a794-d22f302d9b2d
+          threshold:
+            must_be: 0
+            metric: count
+          missing_values: []
+
+  - name: boro
+    data_type: text
+    checks:
+      - missing:
+          name: missing_count(boro) < 10
+          qualifier: 25a148e8-d4d9-46dd-952b-e2c0c690ff27
+          threshold:
+            must_be_less_than: 10
+            metric: count
+
+  - name: bus_company_name
+    data_type: text
+
+  - name: how_long_delayed
+    data_type: text
+
+  - name: number_of_students_on_the_bus
+    data_type: text
+    # Note: This column contains both numeric values and text like "Heavy Traffic"
+    # No numeric range check - values can be numbers or descriptive text
+
+  - name: has_contractor_notified_schools
+    data_type: text
+    checks:
+      - invalid:
+          name: invalid_count(has_contractor_notified_schools) = 0
+          qualifier: 1f1cf48d-b9d1-4745-92f8-2c1948b87896
+          threshold:
+            must_be: 0
+            metric: count
+          valid_values:
+            - "true"
+            - "false"
+          invalid_values:
+            - Invalid
+            - Unknown
+            - N/A
+            - "NULL"
+            - None
+
+  - name: has_contractor_notified_parents
+    data_type: text
+    checks:
+      - invalid:
+          name: invalid_count(has_contractor_notified_parents) = 0
+          qualifier: cf35b7ee-2c3e-46b4-953f-67085734782f
+          threshold:
+            must_be: 0
+            metric: count
+          valid_values:
+            - "true"
+            - "false"
+          invalid_values:
+            - Invalid
+            - Unknown
+            - N/A
+            - "NULL"
+            - None
+
+  - name: have_you_alerted_opt
+    data_type: text
+    checks:
+      - invalid:
+          name: invalid_count(have_you_alerted_opt) = 0
+          qualifier: 40115559-5107-4e24-9175-fe6a15e12bcb
+          threshold:
+            must_be: 0
+            metric: count
+          valid_values:
+            - "true"
+            - "false"
+          invalid_values:
+            - Invalid
+            - Unknown
+            - N/A
+            - "NULL"
+            - None
+
+  - name: informed_on
+    data_type: timestamp
+    # No checks to avoid timestamp casting issues
+
+  - name: last_updated_on
+    data_type: timestamp
+    # No checks to avoid timestamp casting issues
+
+  - name: breakdown_or_running_late
+    data_type: text
+    checks:
+      - invalid:
+          name: invalid_count(breakdown_or_running_late) = 0
+          qualifier: 8e7e27cc-a7dd-4d86-a670-27ca00132fd5
+          threshold:
+            must_be: 0
+            metric: count
+          valid_values:
+            - Breakdown
+            - "Running Late"
+          invalid_values:
+            - Invalid
+            - Unknown
+            - N/A
+            - "NULL"
+            - None
+
+  - name: school_age_or_prek
+    data_type: text
+
+  - name: _dlt_load_id
+    data_type: text
+
+  - name: _dlt_id
+    data_type: text
+
+  - name: incident_number
+    data_type: text
+
