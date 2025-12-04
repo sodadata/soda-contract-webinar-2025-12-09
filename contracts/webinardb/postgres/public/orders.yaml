@@ -1,134 +1,87 @@
 dataset: webinardb/postgres/public/orders
 checks:
   - schema:
-      name: "Schema locked: no extras, fixed order"
+      name: Schema integrity - no drift
       allow_extra_columns: false
       allow_other_column_order: false
+  - duplicate:
+      name: Duplicate order_id detection
+      columns:
+        - order_id
+      threshold:
+        metric: count
+        must_be: 0
+  - failed_rows:
+      name: Shipping date must be after order date
+      expression: shipping_date <= order_date
+      threshold:
+        must_be: 0
 columns:
   - name: order_id
     data_type: text
     checks:
       - missing:
-          name: order_id must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: order_id must be present
       - invalid:
           name: order_id must be UUID v4
           valid_format:
+            name: UUIDv4
             regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
-            name: uuid_v4
-          threshold:
-            metric: count
-            must_be: 0
-      - duplicate:
-          name: order_id must be unique per batch
-          threshold:
-            metric: count
-            must_be: 0
   - name: customer_id
     data_type: text
     checks:
       - missing:
-          name: customer_id must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: customer_id must be present
       - invalid:
           name: customer_id must be UUID v4
           valid_format:
+            name: UUIDv4
             regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
-            name: uuid_v4
-          threshold:
-            metric: count
-            must_be: 0
   - name: order_date
     data_type: date
     checks:
       - missing:
-          name: order_date must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: order_date must be present
   - name: shipping_date
     data_type: date
     checks:
       - missing:
-          name: shipping_date must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: shipping_date must be present
   - name: shipping_address
     data_type: text
     checks:
       - missing:
-          name: shipping_address must not be null or empty
-          missing_values:
-            - ""
-          threshold:
-            metric: count
-            must_be: 0
+          name: shipping_address must be present
       - invalid:
-          name: shipping_address must have reasonable length (>=5)
+          name: Shipping address length between 5 and 200
           valid_min_length: 5
-          threshold:
-            metric: count
-            must_be: 0
+          valid_max_length: 200
   - name: amount
     data_type: numeric
     checks:
       - missing:
-          name: amount must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: amount must be present
       - invalid:
-          name: amount must be non-negative
+          name: Amount must be non-negative
           valid_min: 0
-          threshold:
-            metric: count
-            must_be: 0
   - name: status
     data_type: text
     checks:
       - missing:
-          name: status must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: status must be present
       - invalid:
-          name: status must be valid
+          name: Status must be valid
           valid_values:
             - PENDING
             - SHIPPED
             - CANCELLED
-            - RETURNED
-            - REFUNDED
-          threshold:
-            metric: count
-            must_be: 0
   - name: country_code
     data_type: text
     checks:
       - missing:
-          name: country_code must not be null
-          threshold:
-            metric: count
-            must_be: 0
+          name: country_code must be present
       - invalid:
-          name: country_code must be 2 uppercase letters
+          name: Country code must be 2 uppercase letters
           valid_format:
+            name: AA
             regex: ^[A-Z]{2}$
-            name: two_uppercase_letters
-          threshold:
-            metric: count
-            must_be: 0
-      - invalid:
-          name: country_code must exist in reference table
-          valid_reference_data:
-            dataset: webinardb/postgres/public/ref_countries
-            column: country_code
-          threshold:
-            metric: count
-            must_be: 0
-          qualifier: 123

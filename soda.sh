@@ -4,9 +4,11 @@
 # Usage: 
 #   ./soda.sh data-source-test                  # Test data source connection
 #   ./soda.sh soda-cloud-test                   # Test Soda Cloud connection
+#   ./soda.sh connection-test                   # Test both data source and Soda Cloud connections
 #   ./soda.sh verify                            # Verify a contract
 #   ./soda.sh verify -p <contract_path>         # Verify a contract with custom path
 #   ./soda.sh generate                          # Generate a contract
+#   ./soda.sh generate -p <contract_path>       # Generate a contract with custom path
 #   ./soda.sh fetch-proposal <request_id>.<proposal_id>  # Fetch a proposal
 #   ./soda.sh fetch-proposal <request_id>.<proposal_id> -p <contract_path>  # Fetch with custom path
 
@@ -66,6 +68,54 @@ if [ "$1" == "soda-cloud-test" ]; then
     exit 0
 fi
 
+# If first argument is "connection-test", test both data source and Soda Cloud connections
+if [ "$1" == "connection-test" ]; then
+    # Check if data source file exists
+    if [ ! -f "$DATA_SOURCE" ]; then
+        echo "Error: Data source file not found: $DATA_SOURCE"
+        exit 1
+    fi
+    
+    # Check if cloud config file exists
+    if [ ! -f "$CLOUD_CONFIG" ]; then
+        echo "Error: Soda Cloud config file not found: $CLOUD_CONFIG"
+        exit 1
+    fi
+    
+    echo "=========================================="
+    echo "Testing Data Source Connection"
+    echo "=========================================="
+    echo "Using data source: $DATA_SOURCE"
+    echo ""
+    echo "Running: soda data-source test -ds $DATA_SOURCE"
+    echo ""
+    
+    if ! soda data-source test -ds "$DATA_SOURCE"; then
+        echo ""
+        echo "❌ Data source connection test failed"
+        exit 1
+    fi
+    
+    echo ""
+    echo "=========================================="
+    echo "Testing Soda Cloud Connection"
+    echo "=========================================="
+    echo "Using cloud config: $CLOUD_CONFIG"
+    echo ""
+    echo "Running: soda cloud test -sc $CLOUD_CONFIG"
+    echo ""
+    
+    if ! soda cloud test -sc "$CLOUD_CONFIG"; then
+        echo ""
+        echo "❌ Soda Cloud connection test failed"
+        exit 1
+    fi
+    
+    echo ""
+    echo "✅ All connection tests passed!"
+    exit 0
+fi
+
 # If first argument is "verify", verify a contract
 if [ "$1" == "verify" ]; then
     # Parse -p flag if provided
@@ -98,8 +148,16 @@ fi
 
 # If first argument is "generate", generate a contract
 if [ "$1" == "generate" ]; then
-    # Hardcoded dataset path
-    DATASET="webinardb/postgres/public/orders"
+    # Parse -p flag if provided
+    CUSTOM_PATH=$(parse_contract_path "$@")
+    if [ -n "$CUSTOM_PATH" ]; then
+        CONTRACT_PATH="$CUSTOM_PATH"
+    fi
+    
+    # Extract dataset path from contract path
+    # e.g., contracts/webinardb/postgres/public/orders.yaml -> webinardb/postgres/public/orders
+    DATASET="${CONTRACT_PATH#contracts/}"  # Remove "contracts/" prefix
+    DATASET="${DATASET%.yaml}"             # Remove ".yaml" suffix
     
     # Check if data source file exists
     if [ ! -f "$DATA_SOURCE" ]; then
@@ -186,14 +244,17 @@ fi
 echo "Error: Unknown command: $1"
 echo "Usage: $0 data-source-test               # Test data source connection"
 echo "       $0 soda-cloud-test                # Test Soda Cloud connection"
+echo "       $0 connection-test                # Test both data source and Soda Cloud connections"
 echo "       $0 verify [-p <contract_path>]    # Verify a contract"
-echo "       $0 generate                        # Generate a contract"
+echo "       $0 generate [-p <contract_path>]  # Generate a contract"
 echo "       $0 fetch-proposal <request_id>.<proposal_id> [-p <contract_path>]  # Fetch a proposal"
 echo ""
 echo "Examples:"
+echo "  $0 connection-test"
 echo "  $0 verify"
 echo "  $0 verify -p contracts/custom/path.yaml"
 echo "  $0 generate"
+echo "  $0 generate -p contracts/custom/path.yaml"
 echo "  $0 fetch-proposal 45.1"
 echo "  $0 fetch-proposal 45.1 -p contracts/custom/path.yaml"
 exit 1

@@ -41,7 +41,7 @@ def generate_test_data(has_error=False):
     if has_error:
         print(f"   ⚠️  Generating data with errors for testing")
     
-    valid_statuses = ['PENDING', 'SHIPPED', 'CANCELLED', 'RETURNED', 'REFUNDED']
+    valid_statuses = ['PENDING', 'SHIPPED', 'CANCELLED']
     invalid_status = 'INVALID_STATUS'
     countries = ['AU', 'CA', 'DE', 'FR', 'GB', 'IN', 'US']
     addresses = [
@@ -255,6 +255,7 @@ def step2_verify_locally(**context):
     # CRITICAL: Only fail if checks actually failed (is_failed), not on evaluation errors
     if result.number_of_checks_failed > 0:
         print(f"❌ Contract verification FAILED (checks failed)")
+        ti.max_tries = ti.try_number
         raise Exception("Contract verification failed. Pipeline stopped.")
     else:
         print(f"✅ Contract verification PASSED")
@@ -315,6 +316,7 @@ def step4_verify_on_postgres(**context):
     # CRITICAL: Only fail if checks actually failed (is_failed), not on evaluation errors
     if result.is_failed:
         print(f"❌ Contract verification FAILED (checks failed)")
+        ti.max_tries = ti.try_number 
         raise Exception("Contract verification failed on PostgreSQL.")
     else:
         print(f"✅ Contract verification PASSED")
