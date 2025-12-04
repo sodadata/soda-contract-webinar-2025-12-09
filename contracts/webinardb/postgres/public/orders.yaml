@@ -109,3 +109,9 @@ columns:
           valid_format:
             regex: ^[A-Z]{2}$
             name: iso2_uppercase
+      - invalid:
+          name: Country code must exist in ref table
+          valid_reference_data:
+            dataset: webinardb/postgres/public/ref_countries
+            column: country_code
+          qualifier: 123

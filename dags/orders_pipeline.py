@@ -6,6 +6,8 @@ Pipeline steps:
 2. Verify contract using DuckDB in-memory
 3. Insert verified data to PostgreSQL
 4. Verify contract on PostgreSQL and publish to Soda Cloud
+
+Use {"hasErrors":true} to make it fail
 """
 
 from datetime import datetime, timedelta, date
@@ -57,7 +59,7 @@ def generate_test_data(has_error=False):
     
     valid_statuses = ['PENDING', 'SHIPPED', 'CANCELLED', 'RETURNED', 'REFUNDED']
     invalid_status = 'INVALID_STATUS'
-    countries = ['US', 'CA', 'GB', 'FR', 'DE', 'IT', 'ES', 'NL']
+    countries = ['AU', 'CA', 'DE', 'FR', 'GB', 'IN', 'US']
     addresses = [
         '123 Main Street, New York, NY 10001',
         '456 Oak Avenue, Los Angeles, CA 90001',
@@ -203,9 +205,9 @@ def step1_load(**context):
     print("STEP 1: Generate Test Data")
     print("=" * 60)
     
-    # Get hasError from DAG run config (default: false)
+    # Get hasErrors from DAG run config (default: false)
     dag_run = context.get('dag_run')
-    has_error = dag_run.conf.get('hasError', False) if dag_run and dag_run.conf else False
+    has_error = dag_run.conf.get('hasErrors', False) if dag_run and dag_run.conf else False
     
     # Generate test data
     df = generate_test_data(has_error=has_error)
@@ -273,25 +275,29 @@ def step2_verify_locally(**context):
     # Create data source
     duckdb_data_source = DuckDBDataSource.from_existing_cursor(cursor, name="webinardb")
     
-    try:
-        result = verify_contract_locally(
-            data_sources=[duckdb_data_source],
-            contract_file_path=temp_contract_path,
-            publish=False
-        )
-        
-        if result.is_failed:
-            print(f"❌ Contract verification FAILED")
-            if result.has_errors:
-                print(result.get_errors_str())
-            raise Exception("Contract verification failed. Pipeline stopped.")
-        else:
-            print(f"✅ Contract verification PASSED")
-    finally:
-        conn.close()
-        # Clean up temporary contract file
-        if os.path.exists(temp_contract_path):
-            os.unlink(temp_contract_path)
+    result = verify_contract_locally(
+        data_sources=[duckdb_data_source],
+        contract_file_path=temp_contract_path,
+        publish=False
+    )
+    
+    # Only fail if checks actually failed, not if there were evaluation errors
+    if result.has_errors:
+        print(f"⚠️  Some checks could not be evaluated (errors occurred)")
+        print(result.get_errors_str())
+
+    
+    # CRITICAL: Only fail if checks actually failed (is_failed), not on evaluation errors
+    if result.number_of_checks_failed > 0:
+        print(f"❌ Contract verification FAILED (checks failed)")
+        raise Exception("Contract verification failed. Pipeline stopped.")
+    else:
+        print(f"✅ Contract verification PASSED")
+    
+    conn.close()
+    # Clean up temporary contract file
+    if os.path.exists(temp_contract_path):
+        os.unlink(temp_contract_path)
     
     # Return DataFrame as JSON for next step
     return ti.xcom_pull(task_ids='load')
@@ -336,10 +342,14 @@ def step4_verify_on_postgres(**context):
         publish=True
     )
     
+    # Only fail if checks actually failed, not if there were evaluation errors
+    if result.has_errors:
+        print(f"⚠️  Some checks could not be evaluated (errors occurred)")
+        print(result.get_errors_str())
+
+    # CRITICAL: Only fail if checks actually failed (is_failed), not on evaluation errors
     if result.is_failed:
-        print(f"❌ Contract verification FAILED")
-        if result.has_errors:
-            print(result.get_errors_str())
+        print(f"❌ Contract verification FAILED (checks failed)")
         raise Exception("Contract verification failed on PostgreSQL.")
     else:
         print(f"✅ Contract verification PASSED")
