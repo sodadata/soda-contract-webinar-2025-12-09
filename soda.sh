@@ -186,13 +186,15 @@ fi
 echo "Error: Unknown command: $1"
 echo "Usage: $0 data-source-test               # Test data source connection"
 echo "       $0 soda-cloud-test                # Test Soda Cloud connection"
-echo "       $0 verify                          # Verify a contract"
+echo "       $0 verify [-p <contract_path>]    # Verify a contract"
 echo "       $0 generate                        # Generate a contract"
-echo "       $0 fetch-proposal <request_id>.<proposal_id>  # Fetch a proposal"
+echo "       $0 fetch-proposal <request_id>.<proposal_id> [-p <contract_path>]  # Fetch a proposal"
 echo ""
 echo "Examples:"
 echo "  $0 verify"
+echo "  $0 verify -p contracts/custom/path.yaml"
 echo "  $0 generate"
 echo "  $0 fetch-proposal 45.1"
+echo "  $0 fetch-proposal 45.1 -p contracts/custom/path.yaml"
 exit 1
 

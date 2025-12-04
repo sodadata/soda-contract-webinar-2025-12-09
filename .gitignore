@@ -63,7 +63,7 @@ dmypy.json
 
 # Soda specific
 .soda/
-orders.yaml
+
 
 # Airflow - ignore all temp/runtime files, but keep airflow.cfg
 logs/

@@ -1,0 +1,106 @@
+dataset: webinardb/postgres/public/orders
+checks:
+  - schema:
+      name: "Schema locked: no extras, fixed order"
+      allow_extra_columns: false
+      allow_other_column_order: false
+columns:
+  - name: order_id
+    data_type: text
+    checks:
+      - missing:
+          name: No missing order_id
+          threshold:
+            metric: count
+            must_be: 0
+      - invalid:
+          name: order_id UUID v3 format
+          valid_format:
+            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-3[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+            name: uuid_v3
+      - duplicate:
+          name: No duplicate order_id
+          threshold:
+            metric: count
+            must_be: 0
+  - name: customer_id
+    data_type: text
+    checks:
+      - missing:
+          name: No missing customer_id
+          threshold:
+            metric: count
+            must_be: 0
+      - invalid:
+          name: customer_id UUID v3 format
+          valid_format:
+            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-3[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+            name: uuid_v3
+  - name: order_date
+    data_type: date
+    checks:
+      - missing:
+          name: No missing order_date
+          threshold:
+            metric: count
+            must_be: 0
+  - name: shipping_date
+    data_type: date
+    checks:
+      - missing:
+          name: No missing shipping_date
+          threshold:
+            metric: count
+            must_be: 0
+  - name: shipping_address
+    data_type: text
+    checks:
+      - missing:
+          name: No missing shipping_address
+          threshold:
+            metric: count
+            must_be: 0
+      - invalid:
+          name: Shipping address length between 5 and 200
+          valid_min_length: 5
+          valid_max_length: 200
+  - name: amount
+    data_type: numeric
+    checks:
+      - missing:
+          name: No missing amount
+          threshold:
+            metric: count
+            must_be: 0
+      - invalid:
+          name: Amount must be non-negative
+          valid_min: 0
+  - name: status
+    data_type: text
+    checks:
+      - missing:
+          name: No missing status
+          threshold:
+            metric: count
+            must_be: 0
+      - invalid:
+          name: Status in allowed set
+          valid_values:
+            - PENDING
+            - SHIPPED
+            - CANCELLED
+            - RETURNED
+            - REFUNDED
+  - name: country_code
+    data_type: text
+    checks:
+      - missing:
+          name: No missing country_code
+          threshold:
+            metric: count
+            must_be: 0
+      - invalid:
+          name: Country code uppercase 2-letter
+          valid_format:
+            regex: ^[A-Z]{2}$
+            name: iso2_uppercase
