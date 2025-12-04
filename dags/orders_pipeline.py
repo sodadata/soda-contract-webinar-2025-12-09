@@ -45,19 +45,6 @@ def get_config():
     }
 
 
-def generate_duckdb_select_parts(columns):
-    """Generate SQL select parts for DuckDB view creation."""
-    select_parts = []
-    for col in columns:
-        if col in ['order_date', 'shipping_date']:
-            select_parts.append(f"CAST({col} AS DATE) AS {col}")
-        elif col == 'amount':
-            select_parts.append(f"CAST(amount AS NUMERIC) AS amount")
-        else:
-            select_parts.append(f'"{col}"')
-    return select_parts
-
-
 def generate_test_data(has_error=False):
     """Generate 5 rows of test data."""
     import pandas as pd
@@ -124,13 +111,13 @@ def generate_test_data(has_error=False):
     # Ensure date columns are proper date types
     df['order_date'] = pd.to_datetime(df['order_date']).dt.date
     df['shipping_date'] = pd.to_datetime(df['shipping_date']).dt.date
-    
-    # Generate DuckDB select parts
-    select_parts = generate_duckdb_select_parts(df.columns)
+    # Ensure amount is numeric (not float/double) - use Decimal for proper numeric type
+    from decimal import Decimal
+    df['amount'] = df['amount'].apply(lambda x: Decimal(str(x)) if x is not None else None)
     
     print(f"✅ Generated {len(df)} rows")
     
-    return df, select_parts
+    return df
 
 
 def insert_to_postgres(df, schema="public", table="orders"):
@@ -220,8 +207,8 @@ def step1_load(**context):
     dag_run = context.get('dag_run')
     has_error = dag_run.conf.get('hasError', False) if dag_run and dag_run.conf else False
     
-    # Generate test data and DuckDB select parts
-    df, select_parts = generate_test_data(has_error=has_error)
+    # Generate test data
+    df = generate_test_data(has_error=has_error)
     
     # Print generated data as table
     print("=" * 60)
@@ -229,11 +216,8 @@ def step1_load(**context):
     print(df.to_string(index=False))
     print("=" * 60)
     
-    # Return DataFrame as JSON for XCom and select parts
-    return {
-        'data': df.to_dict('records'),
-        'select_parts': select_parts
-    }
+    # Return DataFrame as JSON for XCom
+    return df.to_dict('records')
 
 
 def step2_verify_locally(**context):
@@ -254,9 +238,8 @@ def step2_verify_locally(**context):
     
     # Get data from previous task
     ti = context['ti']
-    result = ti.xcom_pull(task_ids='load')
-    df = pd.DataFrame(result['data'])
-    select_parts = result['select_parts']
+    data_records = ti.xcom_pull(task_ids='load')
+    df = pd.DataFrame(data_records)
     
     print(f"\n🔍 Verifying contract with DuckDB (in-memory)...")
     configure_logging(verbose=True)
@@ -265,11 +248,9 @@ def step2_verify_locally(**context):
     conn = duckdb.connect(database=":memory:")
     cursor = conn.cursor()
 
-    # Register DataFrame as temporary view
-    cursor.register(view_name="orders_raw", python_object=df)
-
-    # Create view in main schema (DuckDB default)
-    cursor.execute(f'CREATE VIEW orders AS SELECT {", ".join(select_parts)} FROM orders_raw')
+    # Register DataFrame directly as a view in main schema (DuckDB default)
+    # DuckDB will infer types from pandas DataFrame
+    cursor.register(view_name="orders", python_object=df)
     
     # Create temporary contract with adjusted dataset path for DuckDB
     import yaml
@@ -313,7 +294,7 @@ def step2_verify_locally(**context):
             os.unlink(temp_contract_path)
     
     # Return DataFrame as JSON for next step
-    return ti.xcom_pull(task_ids='load')['data']
+    return ti.xcom_pull(task_ids='load')
 
 
 def step3_insert_to_postgres(**context):
