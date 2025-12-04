@@ -14,22 +14,6 @@ from datetime import datetime, timedelta, date
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 import os
-import sys
-
-# Setup venv path for Airflow - KEEP THIS LIGHTWEIGHT
-if 'VIRTUAL_ENV' in os.environ:
-    venv_path = os.environ['VIRTUAL_ENV']
-    site_packages = os.path.join(venv_path, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'site-packages')
-    if os.path.exists(site_packages) and site_packages not in sys.path:
-        sys.path.insert(0, site_packages)
-else:
-    project_root = os.getenv("AIRFLOW_HOME") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    venv_path = os.path.join(project_root, 'venv')
-    if os.path.exists(venv_path):
-        site_packages = os.path.join(venv_path, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'site-packages')
-        if os.path.exists(site_packages) and site_packages not in sys.path:
-            sys.path.insert(0, site_packages)
-
 
 
 # Configuration - Use lazy evaluation
@@ -177,25 +161,6 @@ def insert_to_postgres(df, schema="public", table="orders"):
     finally:
         conn.close()
 
-
-# DAG Definition
-default_args = {
-    'owner': 'data-engineering',
-    'depends_on_past': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
-}
-
-dag = DAG(
-    'orders_pipeline_with_soda',
-    default_args=default_args,
-    description='Orders data pipeline with Soda contract verification',
-    schedule=None,
-    start_date=datetime(2025, 12, 2),
-    catchup=False,
-    is_paused_upon_creation=True,
-    tags=['soda', 'data-quality', 'orders', 'etl'],
-)
 
 
 # Task Functions
@@ -355,6 +320,24 @@ def step4_verify_on_postgres(**context):
         print(f"✅ Contract verification PASSED")
         print("✅ Pipeline completed successfully!")
 
+# DAG Definition
+default_args = {
+    'owner': 'data-engineering',
+    'depends_on_past': False,
+    'retries': 1,
+    'retry_delay': timedelta(seconds=30),
+}
+
+dag = DAG(
+    'orders_pipeline_with_soda',
+    default_args=default_args,
+    description='Orders data pipeline with Soda contract verification',
+    schedule=None,
+    start_date=datetime(2025, 12, 2),
+    catchup=False,
+    is_paused_upon_creation=True,
+    tags=['soda', 'data-quality', 'orders', 'etl'],
+)
 
 # Define Tasks
 load = PythonOperator(
