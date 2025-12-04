@@ -1,4 +1,0 @@
-order_id,customer_id,order_date,shipping_date,shipping_address,amount,status,country_code
-3f1a2b3c-4d5e-3f6a-7b8c-9d0e1f2a3b4c,3a2b3c4d-5e6f-3a7b-8c9d-0e1f2a3b4c5d,2025-12-09,2025-11-28,"890 Broadway Boulevard, Seattle, WA 98101",250.00,SHIPPED,US
-3b4c5d6e-7f8a-3b9c-0d1e-2f3a4b5c6d7e,3c5d6e7f-8a9b-3c0d-1e2f-3a4b5c6d7e8f,2025-12-09,2025-12-09,"567 Park Lane, Boston, MA 02101",125.75,INVALID_STATUS,US
-3d6e7f8a-9b0c-3d1e-2f3a-4b5c6d7e8f9a,3e7f8a9b-0c1d-3e2f-3a4b-5c6d7e8f9a0b,2025-12-09,2025-12-09,"234 River Street, Miami, FL 33101",89.99,PENDING,usa

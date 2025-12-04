@@ -4,6 +4,11 @@ checks:
       name: "Schema locked: no extras, fixed order"
       allow_extra_columns: false
       allow_other_column_order: false
+  - failed_rows:
+      name: Shipping date must be after order date
+      expression: shipping_date < order_date
+      threshold:
+        must_be: 0
 columns:
   - name: order_id
     data_type: text
@@ -14,10 +19,10 @@ columns:
             metric: count
             must_be: 0
       - invalid:
-          name: order_id UUID v3 format
+          name: order_id UUID v4 format
           valid_format:
-            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-3[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
-            name: uuid_v3
+            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+            name: uuid_v4
       - duplicate:
           name: No duplicate order_id
           threshold:
@@ -32,10 +37,10 @@ columns:
             metric: count
             must_be: 0
       - invalid:
-          name: customer_id UUID v3 format
+          name: customer_id UUID v4 format
           valid_format:
-            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-3[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
-            name: uuid_v3
+            regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+            name: uuid_v4
   - name: order_date
     data_type: date
     checks:

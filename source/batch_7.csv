@@ -1,5 +1,0 @@
-order_id,customer_id,order_date,shipping_date,shipping_address,amount,status,country_code
-3a6b7c8d-9e0f-3a1b-2c3d-4e5f6a7b8c9d,3b7c8d9e-0f1a-3b2c-3d4e-5f6a7b8c9d0e,2025-12-09,2025-12-09,"888 Eighth Lane, San Francisco, CA 94101",189.75,SHIPPED,US
-3c8d9e0f-1a2b-3c3d-4e5f-6a7b8c9d0e1f,3d9e0f1a-2b3c-3d4e-5f6a-7b8c9d0e1f2a,2025-12-09,2025-12-09,"999 Ninth Drive, Seattle, WA 98101",92.50,PENDING,US
-3e0f1a2b-3c4d-3e5a-6b7c-8d9e0f1a2b3c,3f1a2b3c-4d5e-3f6a-7b8c-9d0e1f2a3b4c,2025-12-09,2025-12-09,"1010 Tenth Avenue, Dallas, TX 75201",275.00,CANCELLED,US
-

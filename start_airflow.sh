@@ -4,6 +4,12 @@
 export AIRFLOW_HOME=/Users/benjaminpirotte/Documents/soda/soda-contract-webinar
 # Fix for macOS fork() issue with Objective-C runtime
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+export AIRFLOW__CORE__LOAD_EXAMPLES=False
+export AIRFLOW__CORE__PARALLELISM=32
+export AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG=16
+export AIRFLOW__SCHEDULER__PARSING_PROCESSES=4
+export AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT=120
+
 
 # Increase memory limits for Airflow tasks
 # Set Python memory-related environment variables

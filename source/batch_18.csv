@@ -1,5 +1,0 @@
-order_id,customer_id,order_date,shipping_date,shipping_address,amount,status,country_code
-3a0b1c2d-3e4f-3a5b-6c7d-8e9f0a1b2c3d,3b1c2d3e-4f5a-3b6c-7d8e-9f0a1b2c3d4e,2025-12-09,2025-12-02,"4141 Forty-First Street, Henderson, NV 89001",-20.25,PENDING,US
-4c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f,4d3e4f5a-6b7c-4d8e-9f0a-1b2c3d4e5f6a,2025-12-09,2025-12-09,"4242 Forty-Second Road, Saint Paul, MN 55101",156.33,IN_PROGRESS,US
-3e4f5a6b-7c8d-3e9a-0b1c-2d3e4f5a6b7c,3f5a6b7c-8d9e-3f0a-1b2c-3d4e5f6a7b8c,2025-12-09,2025-12-09,"4343 Forty-Third Lane, Cincinnati, OH 45201",201.50,SHIPPED,GB
-
