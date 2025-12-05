@@ -177,10 +177,10 @@ if [ "$1" == "generate" ]; then
     echo "Using data source: $DATA_SOURCE"
     echo "Using cloud config: $CLOUD_CONFIG"
     echo ""
-    echo "Running: soda contract create --dataset $DATASET --file $CONTRACT_PATH --data-source $DATA_SOURCE --soda-cloud $CLOUD_CONFIG"
+    echo "Running: soda contract create --dataset $DATASET --file $CONTRACT_PATH --data-source $DATA_SOURCE"
     echo ""
     
-    soda contract create --dataset "$DATASET" --file "$CONTRACT_PATH" --data-source "$DATA_SOURCE" --soda-cloud "$CLOUD_CONFIG"
+    soda contract create --dataset "$DATASET" --file "$CONTRACT_PATH" --data-source "$DATA_SOURCE"
     exit 0
 fi
 
