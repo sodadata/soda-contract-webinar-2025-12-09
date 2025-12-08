@@ -4,42 +4,40 @@ This guide explains how to run the orders pipeline with Apache Airflow, demonstr
 
 ## Overview
 
-The Airflow DAG (`orders_pipeline_dag.py`) orchestrates the following workflow:
+The Airflow DAG (`orders_pipeline.py`) orchestrates the following workflow:
 
-1. **load_to_staging**: Load CSV data and insert into `staging.orders`
-2. **verify_staging**: Verify data quality contract on staging (data quality gate)
-3. **publish_to_public**: If verification passes, copy data to `public.orders`
-4. **verify_public**: Verify contract on public and publish results to Soda Cloud
+1. **load**: Generate test data (5 rows)
+2. **verify_locally**: Verify contract using DuckDB in-memory (data quality gate before database write)
+3. **insert_to_public**: Insert verified data to PostgreSQL
+4. **verify_public**: Verify contract on PostgreSQL and publish results to Soda Cloud
 
 The pipeline **fails** if any data quality check fails, preventing bad data from reaching production.
 
 ## Setup
 
-### 1. Install Airflow
+### 1. Install Dependencies
 
 ```bash
-# Install Airflow (standalone mode for development)
-pip install apache-airflow
+# Install Soda packages from private PyPI
+pip install -i https://pypi.dev.sodadata.io/simple -U soda-postgres soda-duckdb
 
-# This automatically initializes the database and creates a default admin user
-# Default credentials: admin / admin
-airflow standalone
-
+# Install other dependencies
+pip install -r requirements.txt
 ```
 
 ### 2. Configure Airflow
 
-add to your `.env` file:
+Add to your `.env` file:
 ```
-AIRFLOW_HOME=/Users/benjaminpirotte/Documents/soda/soda-contract-webinar
+AIRFLOW_HOME=/path/to/soda-contract-webinar
 ```
 
-### 3. DAG Files Location
+### 3. Create Database Table
 
-The DAG file is already in the correct location:
-- `dags/orders_pipeline_dag.py` - The Airflow DAG (contains all pipeline functions)
-
-Since `AIRFLOW_HOME` is set to your project root, Airflow will automatically discover DAGs in the `dags/` folder. No additional configuration needed!
+Run the DDL script to create the orders table:
+```bash
+psql -h <host> -U <user> -d <database> -f ddl/create_orders_table.sql
+```
 
 ### 4. Ensure Environment Variables are Set
 
@@ -78,10 +76,10 @@ Login with the default credentials:
 1. Find the `orders_pipeline_with_soda` DAG in the Airflow UI
 2. Toggle it ON to enable it
 3. Click the "Play" button to trigger a DAG run
-4. Optionally, pass a `batch_id` via the "Trigger DAG w/ config" option:
+4. Optionally, pass `hasErrors` via the "Trigger DAG w/ config" option:
    ```json
    {
-     "batch_id": "1"
+     "hasErrors": true
    }
    ```
 
@@ -90,21 +88,37 @@ Login with the default credentials:
 ### Task Flow
 
 ```
-load_to_staging → verify_staging → publish_to_public → verify_public
+load → verify_locally → insert_to_public → verify_public
 ```
 
-- **load_to_staging**: Loads CSV and inserts into staging
-- **verify_staging**: **Data Quality Gate** - If this fails, the pipeline stops
-- **publish_to_public**: Only runs if staging verification passes
-- **verify_public**: Final verification with publishing to Soda Cloud
+- **load**: Generates 5 rows of test data
+- **verify_locally**: **Data Quality Gate** - Verifies contract with DuckDB in-memory. If this fails, the pipeline stops.
+- **insert_to_public**: Only runs if local verification passes. Inserts data to PostgreSQL.
+- **verify_public**: Final verification on PostgreSQL with publishing to Soda Cloud
 
 ### Data Quality Gates
 
-The `verify_staging` task acts as a **data quality gate**:
-- ✅ If verification passes → data proceeds to production
-- ❌ If verification fails → pipeline stops, bad data never reaches production
+The `verify_locally` task acts as a **data quality gate**:
+- ✅ If verification passes → data proceeds to PostgreSQL
+- ❌ If verification fails → pipeline stops, bad data never reaches the database
 
 This demonstrates how Soda prevents bad data from contaminating your production tables.
+
+### Testing with Errors
+
+To test error handling, trigger the DAG with:
+```json
+{
+  "hasErrors": true
+}
+```
+
+This will generate data with:
+- Row 0: shipping_date before order_date (data quality issue)
+- Row 1: Invalid status value
+- Row 2: Missing status value
+
+The pipeline should fail at the `verify_locally` step.
 
 ## Monitoring
 
@@ -121,25 +135,12 @@ When `verify_public` runs with `publish=True`, results are sent to Soda Cloud wh
 - Track data quality trends
 - Set up alerts for data quality issues
 
-## Testing with Different Batches
-
-To test with different CSV batches, trigger the DAG with a config:
-
-```json
-{
-  "batch_id": "2"
-}
-```
-
-- **Odd-numbered batches** (1, 3, 5, etc.): Good quality data - should pass
-- **Even-numbered batches** (2, 4, 6, etc.): Bad quality data - should fail at verify_staging
-
 ## Troubleshooting
 
 ### DAG Not Appearing
 
 - Check that `AIRFLOW_HOME` is set correctly
-- Verify the DAG file is in the `dags_folder`
+- Verify the DAG file is in the `dags/` folder
 - Check Airflow logs: `$AIRFLOW_HOME/logs/`
 
 ### Import Errors
@@ -152,12 +153,12 @@ To test with different CSV batches, trigger the DAG with a config:
 - Verify `.env` file has all required variables
 - Test database connection: `./soda.sh data-source-test`
 - Test Soda Cloud connection: `./soda.sh soda-cloud-test`
+- Test both: `./soda.sh connection-test`
 
 ## Best Practices Demonstrated
 
-1. **Staging Environment**: Data is validated in staging before production
+1. **In-Memory Validation**: Data is validated in-memory (DuckDB) before database write
 2. **Fail Fast**: Pipeline stops immediately if data quality checks fail
 3. **Separation of Concerns**: Each task has a single responsibility
 4. **Observability**: Results are published to Soda Cloud for monitoring
 5. **Idempotency**: Tasks can be rerun safely
-

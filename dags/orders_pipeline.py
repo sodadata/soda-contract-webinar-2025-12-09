@@ -177,10 +177,16 @@ def step1_load(**context):
     # Generate test data
     df = generate_test_data(has_error=has_error)
     
-    # Print generated data as table
+    # Print generated data as table with nice formatting
     print("=" * 60)
     print(f"\n📊 Generated Data:")
-    print(df.to_string(index=False))
+    print()
+    
+    # Create a nicely formatted table with borders
+    from tabulate import tabulate
+    print(tabulate(df, headers='keys', tablefmt='grid', showindex=False))
+    
+    print()
     print("=" * 60)
     
     # Return DataFrame as JSON for XCom

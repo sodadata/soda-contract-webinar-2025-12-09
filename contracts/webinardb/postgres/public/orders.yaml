@@ -1,0 +1,20 @@
+dataset: webinardb/postgres/public/orders
+columns:
+  - name: order_id
+    data_type: text
+  - name: customer_id
+    data_type: text
+  - name: order_date
+    data_type: date
+  - name: shipping_date
+    data_type: date
+  - name: shipping_address
+    data_type: text
+  - name: amount
+    data_type: numeric
+  - name: status
+    data_type: text
+  - name: country_code
+    data_type: text
+checks:
+  - schema:

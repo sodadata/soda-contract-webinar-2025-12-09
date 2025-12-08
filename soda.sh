@@ -5,8 +5,10 @@
 #   ./soda.sh data-source-test                  # Test data source connection
 #   ./soda.sh soda-cloud-test                   # Test Soda Cloud connection
 #   ./soda.sh connection-test                   # Test both data source and Soda Cloud connections
-#   ./soda.sh verify                            # Verify a contract
-#   ./soda.sh verify -p <contract_path>         # Verify a contract with custom path
+#   ./soda.sh verify                            # Verify a contract (with publishing)
+#   ./soda.sh verify -p <contract_path>         # Verify a contract with custom path (with publishing)
+#   ./soda.sh publish                           # Publish a contract to Soda Cloud
+#   ./soda.sh publish -p <contract_path>       # Publish a contract with custom path
 #   ./soda.sh generate                          # Generate a contract
 #   ./soda.sh generate -p <contract_path>       # Generate a contract with custom path
 #   ./soda.sh fetch-proposal <request_id>.<proposal_id>  # Fetch a proposal
@@ -130,6 +132,12 @@ if [ "$1" == "verify" ]; then
         exit 1
     fi
     
+    # Check if cloud config file exists
+    if [ ! -f "$CLOUD_CONFIG" ]; then
+        echo "Error: Soda Cloud config file not found: $CLOUD_CONFIG"
+        exit 1
+    fi
+    
     # Check if contract file exists
     if [ ! -f "$CONTRACT_PATH" ]; then
         echo "Error: Contract file not found: $CONTRACT_PATH"
@@ -138,11 +146,43 @@ if [ "$1" == "verify" ]; then
     
     echo "Verifying contract: $CONTRACT_PATH"
     echo "Using data source: $DATA_SOURCE"
+    echo "Using cloud config: $CLOUD_CONFIG"
+    echo "Publishing to Soda Cloud: Yes"
     echo ""
-    echo "Running: soda contract verify --data-source $DATA_SOURCE --contract $CONTRACT_PATH"
+    echo "Running: soda contract verify --data-source $DATA_SOURCE --contract $CONTRACT_PATH --soda-cloud $CLOUD_CONFIG --publish"
     echo ""
     
-    soda contract verify --data-source "$DATA_SOURCE" --contract "$CONTRACT_PATH"
+    soda contract verify --data-source "$DATA_SOURCE" --contract "$CONTRACT_PATH" --soda-cloud "$CLOUD_CONFIG" --publish
+    exit 0
+fi
+
+# If first argument is "publish", publish a contract to Soda Cloud
+if [ "$1" == "publish" ]; then
+    # Parse -p flag if provided
+    CUSTOM_PATH=$(parse_contract_path "$@")
+    if [ -n "$CUSTOM_PATH" ]; then
+        CONTRACT_PATH="$CUSTOM_PATH"
+    fi
+    
+    # Check if cloud config file exists
+    if [ ! -f "$CLOUD_CONFIG" ]; then
+        echo "Error: Soda Cloud config file not found: $CLOUD_CONFIG"
+        exit 1
+    fi
+    
+    # Check if contract file exists
+    if [ ! -f "$CONTRACT_PATH" ]; then
+        echo "Error: Contract file not found: $CONTRACT_PATH"
+        exit 1
+    fi
+    
+    echo "Publishing contract: $CONTRACT_PATH"
+    echo "Using cloud config: $CLOUD_CONFIG"
+    echo ""
+    echo "Running: soda contract publish --contract $CONTRACT_PATH --soda-cloud $CLOUD_CONFIG"
+    echo ""
+    
+    soda contract publish --contract "$CONTRACT_PATH" --soda-cloud "$CLOUD_CONFIG"
     exit 0
 fi
 
@@ -245,7 +285,8 @@ echo "Error: Unknown command: $1"
 echo "Usage: $0 data-source-test               # Test data source connection"
 echo "       $0 soda-cloud-test                # Test Soda Cloud connection"
 echo "       $0 connection-test                # Test both data source and Soda Cloud connections"
-echo "       $0 verify [-p <contract_path>]    # Verify a contract"
+echo "       $0 verify [-p <contract_path>]    # Verify a contract (with publishing)"
+echo "       $0 publish [-p <contract_path>]   # Publish a contract to Soda Cloud"
 echo "       $0 generate [-p <contract_path>]  # Generate a contract"
 echo "       $0 fetch-proposal <request_id>.<proposal_id> [-p <contract_path>]  # Fetch a proposal"
 echo ""
@@ -253,6 +294,8 @@ echo "Examples:"
 echo "  $0 connection-test"
 echo "  $0 verify"
 echo "  $0 verify -p contracts/custom/path.yaml"
+echo "  $0 publish"
+echo "  $0 publish -p contracts/custom/path.yaml"
 echo "  $0 generate"
 echo "  $0 generate -p contracts/custom/path.yaml"
 echo "  $0 fetch-proposal 45.1"
