@@ -2,6 +2,9 @@
 
 This project demonstrates how to integrate Soda data quality contracts into an Apache Airflow data pipeline. It shows how to validate data quality before writing to production databases, preventing bad data from contaminating your data warehouse.
 
+![Watch Live Demo on Youtube](https://www.youtube.com/watch?v=9SFGArr1L-I)
+[![Watch Live Demo](https://img.youtube.com/vi/9SFGArr1L-I/maxresdefault.jpg)](https://www.youtube.com/watch?v=9SFGArr1L-I)
+
 ## Overview
 
 The demo includes:
@@ -12,6 +15,7 @@ The demo includes:
 - **Soda Cloud Integration** for monitoring and observability
 
 ## Architecture
+<img width="780" height="393" alt="Screenshot 2025-12-10 at 19 30 16" src="https://github.com/user-attachments/assets/1ddcb340-ba64-406b-ad37-36ce0fa80f34" />
 
 ```
 ┌─────────────┐
@@ -212,4 +216,4 @@ See [AIRFLOW_README.md](AIRFLOW_README.md) for Airflow-specific troubleshooting.
 ## Documentation
 
 - [Soda v4 Reference Documentation](https://docs.soda.io/soda-v4/reference) - Complete reference for Soda's interfaces, configuration options, and APIs
-
+- [Presentation from Webinar](https://docs.google.com/presentation/d/1pt-dCjqf0EWNw47HMY655lnhl7D9a9DtOKupO9Z4JCo/edit?usp=sharing)
