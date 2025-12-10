@@ -114,14 +114,14 @@ airflow standalone
 #### Option B: Using Soda CLI
 
 ```bash
-# Verify contract
-./soda.sh verify
-
 # Generate contract
-./soda.sh generate
+./soda.sh generate -p webinardb/postgres/public/orders
+
+# Verify contract
+./soda.sh verify -p contracts/webinardb/postgres/public/orders.yaml
 
 # Publish contract
-./soda.sh publish
+./soda.sh publish -p contracts/webinardb/postgres/public/orders.yaml
 ```
 
 ## Pipeline Steps
@@ -151,7 +151,9 @@ Generates 5 rows of test order data with:
 
 ## Data Quality Checks
 
-The contract (`contracts/webinardb/postgres/public/orders.yaml`) includes:
+The contract (`contracts/webinardb/postgres/public/orders_final.yaml`) contains all the checks and can be used as a reference. 
+
+The contract includes:
 
 - **Schema validation**: No extra columns, fixed column order
 - **UUID validation**: order_id and customer_id must be valid UUID v4
