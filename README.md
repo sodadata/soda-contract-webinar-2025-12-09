@@ -2,7 +2,7 @@
 
 This project demonstrates how to integrate Soda data quality contracts into an Apache Airflow data pipeline. It shows how to validate data quality before writing to production databases, preventing bad data from contaminating your data warehouse.
 
-![Watch Live Demo on Youtube](https://www.youtube.com/watch?v=9SFGArr1L-I)
+🔗[Watch Live Demo](https://www.youtube.com/watch?v=9SFGArr1L-I)
 [![Watch Live Demo](https://img.youtube.com/vi/9SFGArr1L-I/maxresdefault.jpg)](https://www.youtube.com/watch?v=9SFGArr1L-I)
 
 ## Overview
