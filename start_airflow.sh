@@ -1,7 +1,17 @@
 #!/bin/bash
 # Start Airflow standalone with correct AIRFLOW_HOME
 
-export AIRFLOW_HOME=/Users/benjaminpirotte/Documents/soda/soda-contract-webinar
+# Get the absolute path of the directory containing this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export AIRFLOW_HOME="$SCRIPT_DIR"
+
+# Set all paths to use absolute paths (required by Airflow)
+export AIRFLOW__CORE__DAGS_FOLDER="${SCRIPT_DIR}/dags"
+export AIRFLOW__CORE__PLUGINS_FOLDER="${SCRIPT_DIR}/plugins"
+export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN="sqlite:///${SCRIPT_DIR}/airflow.db"
+export AIRFLOW__LOGGING__BASE_LOG_FOLDER="${SCRIPT_DIR}/logs"
+export AIRFLOW__LOGGING__DAG_PROCESSOR_CHILD_PROCESS_LOG_DIRECTORY="${SCRIPT_DIR}/logs/dag_processor"
+
 # Fix for macOS fork() issue with Objective-C runtime
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export AIRFLOW__CORE__LOAD_EXAMPLES=False
